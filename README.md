@@ -1,23 +1,22 @@
-# Resume Job Matcher
+Resume Job Matcher
 
-A Flask-based web application that extracts text from uploaded resumes and analyzes candidate qualifications.
+An AI-powered resume analysis and job matching system built with Flask, NLP, and Sentence Transformers.
 
-## Features
+Features:
+- PDF resume parsing
+- Semantic job matching
+- ATS compatibility scoring
+- Resume quality analysis
+- Career path prediction
+- Skill extraction
+- Technical domain detection
+- Match score breakdown
+- Resume recommendations
 
-- Resume PDF Upload
-- Text Extraction using pdfplumber
-- Skill Detection
-- Job Description Matching (Planned)
-- NLP-Based Similarity Scoring (Planned)
-
-## Technologies Used
-
+Technologies:
 - Python
 - Flask
-- HTML
-- CSS
-- pdfplumber
-
-## Author
-
-Mico Yumul
+- Sentence Transformers
+- Scikit-learn
+- NLTK
+- PDFPlumber
