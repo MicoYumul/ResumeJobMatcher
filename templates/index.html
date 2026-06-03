@@ -7,15 +7,399 @@
 
     <h1>Resume Job Matcher</h1>
 
+    <p>
+        Upload a resume and compare it against a job description.
+    </p>
+
+    <hr>
+
     <form action="/upload" method="POST" enctype="multipart/form-data">
 
-        <input type="file" name="resume" required>
+        <h2>Resume Upload</h2>
+
+        <input
+            type="file"
+            name="resume"
+            accept=".pdf"
+            required
+        >
+
+        <br><br>
+
+        <h2>Job Description</h2>
+
+        <textarea
+            name="job_description"
+            rows="12"
+            cols="80"
+            placeholder="Paste the job description here..."
+        ></textarea>
+
+        <br><br>
 
         <button type="submit">
-            Upload Resume
+            Analyze Resume
         </button>
 
     </form>
+
+    <hr>
+
+    <h2>Analysis Results</h2>
+
+    <hr>
+
+    <h3>Match Score</h3>
+
+    <p>
+        {{ match_score if match_score is defined else 0 }}%
+    </p>
+
+    <hr>
+
+    <p>
+        {{ match_rating if match_rating is defined else "Not Available" }}
+    </p>
+
+    <hr>
+
+    <h3>Resume Quality Score</h3>
+
+    <p>
+        {{ quality_score if quality_score is defined else 0 }}/100
+    </p>
+
+    <hr>
+
+    <h3>ATS Compatibility Score</h3>
+
+    <p>
+        {{ ats_score if ats_score is defined else 0 }}/100
+    </p>
+
+    <hr>
+
+    <hr>
+
+    <h3>Score Breakdown</h3>
+
+    <ul>
+        <li>
+            Semantic Match:
+            {{ semantic_score if semantic_score is defined else 0 }}%
+        </li>
+
+        <li>
+            Skills Match:
+            {{ skills_match_score if skills_match_score is defined else 0 }}%
+        </li>
+
+        <li>
+            ATS Score:
+            {{ ats_score if ats_score is defined else 0 }}%
+        </li>
+    </ul>
+
+    <hr>
+
+    <h3>Resume Statistics</h3>
+
+    <ul>
+        <li>Words: {{ word_count if word_count is defined else 0 }}</li>
+        <li>Skills Found: {{ skills_count if skills_count is defined else 0 }}</li>
+        <li>Domains Detected: {{ domain_count if domain_count is defined else 0 }}</li>
+    </ul>
+
+    <hr>
+
+    <h3>Predicted Career Path</h3>
+
+    <p>
+        {{ predicted_career if predicted_career is defined else "Not Available" }}
+    </p>
+
+    <h3>Suitable Career Paths</h3>
+
+    <ul>
+
+    {% if top_careers %}
+
+        {% for career in top_careers %}
+            <li>{{ career }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No career paths detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <p>
+        Confidence:
+        {{ career_confidence if career_confidence is defined else 0 }}%
+    </p>
+
+    <hr>
+
+    <h3>Detected Resume Sections</h3>
+
+    <ul>
+
+    {% if sections %}
+
+        {% for section in sections %}
+            <li>{{ section }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No sections detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Technical Domains</h3>
+
+    <ul>
+
+    {% if detected_domains %}
+
+        {% for domain in detected_domains %}
+            <li>{{ domain }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No domains detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Candidate Profile</h3>
+
+    <ul>
+
+    {% if candidate_profile %}
+
+        {% for item in candidate_profile %}
+            <li>{{ item }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No profile generated</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Resume Summary</h3>
+
+    <ul>
+
+    {% if summary %}
+
+        {% for item in summary %}
+            <li>{{ item }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No summary generated</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Why This Score?</h3>
+
+    <ul>
+
+    {% if matched_areas %}
+
+        {% for item in matched_areas %}
+            <li>{{ item }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No matching technical areas detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Skill Categories</h3>
+
+    {% for category, skills in skill_categories.items() %}
+
+    <h4>{{ category }}</h4>
+
+    <ul>
+
+    {% if skills %}
+
+        {% for skill in skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No skills detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    {% endfor %}
+
+    <hr>
+
+    <h3>Skills Found</h3>
+
+    <ul>
+
+    {% if resume_skills %}
+
+        {% for skill in resume_skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No skills detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Matching Skills</h3>
+
+    <ul>
+
+    {% if matching_skills %}
+
+        {% for skill in matching_skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No matching skills</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Missing Skills</h3>
+
+    <ul>
+
+    {% if missing_skills %}
+
+        {% for skill in missing_skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No missing skills</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Top Keywords</h3>
+
+    <ul>
+
+    {% if top_keywords %}
+
+        {% for keyword in top_keywords %}
+            <li>{{ keyword }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No keywords detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Strengths</h3>
+
+    <ul>
+
+    {% if strengths %}
+
+        {% for strength in strengths %}
+            <li>{{ strength }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No strengths detected</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Recommendations</h3>
+
+    <ul>
+
+    {% if recommendations %}
+
+        {% for recommendation in recommendations %}
+            <li>{{ recommendation }}</li>
+        {% endfor %}
+
+    {% else %}
+
+        <li>No recommendations available</li>
+
+    {% endif %}
+
+    </ul>
+
+    <hr>
+
+    <h3>Resume Preview</h3>
+
+    <textarea
+        rows="20"
+        cols="100"
+        readonly
+    >
+    {{ resume_text if resume_text is defined else "" }}
+    </textarea>
 
 </body>
 </html>
