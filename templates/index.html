@@ -2,12 +2,38 @@
 <html>
 <head>
     <title>Resume Job Matcher</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
 <body>
 
-    <h1>Resume Job Matcher</h1>
+    <div class="header-container">
 
-    <p>
+        <h1>Resume Job Matcher</h1>
+
+        <button
+            type="button"
+            id="themeToggle"
+            class="theme-btn">
+
+            🌙 Dark Mode
+
+        </button>
+
+    </div>
+
+    {% if error %}
+
+    <p class="error-message">
+        {{ error }}
+    </p>
+
+    {% endif %}
+
+    <p class="subtitle">
         Upload a resume and compare it against a job description.
     </p>
 
@@ -15,18 +41,31 @@
 
     <form action="/upload" method="POST" enctype="multipart/form-data">
 
-        <h2>Resume Upload</h2>
+        <h2 class="section-title">Resume Upload</h2>
 
-        <input
-            type="file"
-            name="resume"
-            accept=".pdf"
-            required
-        >
+        <div class="upload-container">
+
+            <label for="resume" class="upload-box" id="uploadBox">
+
+                <span class="upload-text" id="uploadText">
+                    📄 Click to Upload Resume PDF
+                </span>
+
+            </label>
+
+            <input
+                type="file"
+                id="resume"
+                name="resume"
+                accept=".pdf"
+                required
+            >
+
+        </div>
 
         <br><br>
 
-        <h2>Job Description</h2>
+        <h2 class="section-title">Job Description</h2>
 
         <textarea
             name="job_description"
@@ -45,15 +84,21 @@
 
     <hr>
 
-    <h2>Analysis Results</h2>
+    <div class="results-container">
+
+    <h2 class="section-title">Analysis Results</h2>
 
     <hr>
+
+    <div class="result-card">
 
     <h3>Match Score</h3>
 
     <p>
         {{ match_score if match_score is defined else 0 }}%
     </p>
+
+    </div>
 
     <hr>
 
@@ -62,6 +107,7 @@
     </p>
 
     <hr>
+    <div class="result-card">
 
     <h3>Resume Quality Score</h3>
 
@@ -69,15 +115,41 @@
         {{ quality_score if quality_score is defined else 0 }}/100
     </p>
 
+    </div>
+
     <hr>
 
+    <div class="result-card">
+
+    <h3>Resume Grade</h3>
+
+    <p>
+        {{ resume_grade if resume_grade is defined else "N/A" }}
+    </p>
+
+    </div>
+
+    <hr>
+    <div class="result-card">
     <h3>ATS Compatibility Score</h3>
 
     <p>
         {{ ats_score if ats_score is defined else 0 }}/100
     </p>
+    
+    </div>
 
     <hr>
+
+    <div class="result-card">
+
+    <h3>Hiring Recommendation</h3>
+
+    <p>
+        {{ hiring_recommendation if hiring_recommendation is defined else "N/A" }}
+    </p>
+
+    </div>
 
     <hr>
 
@@ -111,12 +183,15 @@
     </ul>
 
     <hr>
+    <div class="result-card">
 
     <h3>Predicted Career Path</h3>
 
     <p>
         {{ predicted_career if predicted_career is defined else "Not Available" }}
     </p>
+
+    </div>
 
     <h3>Suitable Career Paths</h3>
 
@@ -165,6 +240,8 @@
 
     <hr>
 
+    <div class="result-card">
+
     <h3>Technical Domains</h3>
 
     <ul>
@@ -183,7 +260,10 @@
 
     </ul>
 
+    </div>
+
     <hr>
+    <div class="result-card">
 
     <h3>Candidate Profile</h3>
 
@@ -202,6 +282,8 @@
     {% endif %}
 
     </ul>
+
+    </div>
 
     <hr>
 
@@ -245,7 +327,7 @@
 
     <hr>
 
-    <h3>Skill Categories</h3>
+    <h2 class="section-title">Skill Categories</h2>
 
     {% for category, skills in skill_categories.items() %}
 
@@ -391,15 +473,19 @@
 
     <hr>
 
-    <h3>Resume Preview</h3>
+    <h2 class="section-title">Resume Preview</h2>
 
     <textarea
         rows="20"
         cols="100"
-        readonly
-    >
-    {{ resume_text if resume_text is defined else "" }}
-    </textarea>
+        readonly>{{ resume_text if resume_text is defined else "" }}</textarea>
+
+    
+    </div>
+
+    <script
+    src="{{ url_for('static', filename='js/main.js') }}">
+    </script>
 
 </body>
 </html>

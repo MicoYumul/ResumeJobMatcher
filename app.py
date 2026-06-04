@@ -133,20 +133,29 @@ def upload():
     if "research" in resume_lower:
         summary.append("Research and technical documentation experience.")
 
-    # Candidate Profile
-    candidate_profile_text = f'''
-    Skills: {' '.join(resume_skills)}
-    Domains: {' '.join(detected_domains)}
-    Projects: {' '.join(summary)}
-    Career: {predicted_career}
-    '''
+    # Use actual resume content for semantic matching
+    # This improves matching accuracy because the model
+    # sees the real resume instead of a short summary.
+
+    candidate_profile_text = resume_text[:5000]
 
     # Semantic Matching
     resume_embedding = model.encode(candidate_profile_text)
     job_embedding = model.encode(job_description)
 
-    similarity = cosine_similarity([resume_embedding], [job_embedding])
-    match_score = round(similarity[0][0] * 100)
+    similarity = cosine_similarity(
+        [resume_embedding],
+        [job_embedding]
+    )
+
+    raw_score = similarity[0][0]
+
+    # Scale semantic similarity to a more realistic recruiter score
+
+    match_score = round(raw_score * 130)
+
+    if match_score > 100:
+        match_score = 100
 
     semantic_score = match_score
 
@@ -155,10 +164,12 @@ def upload():
         skills_match_score = round((len(matching_skills) / len(job_skills)) * 100)
 
     # Match Rating
-    if match_score >= 80:
+    if match_score >= 90:
         match_rating = "Excellent Match"
-    elif match_score >= 60:
+    elif match_score >= 75:
         match_rating = "Strong Match"
+    elif match_score >= 60:
+        match_rating = "Good Match"
     elif match_score >= 40:
         match_rating = "Moderate Match"
     else:
@@ -185,8 +196,29 @@ def upload():
         if section in resume_lower:
             sections.append(section.title())
 
-    # Scores
-    quality_score = min((len(sections) * 15) + (len(detected_domains) * 5) + min(len(resume_skills), 10), 100)
+   # Resume quality scoring
+
+    quality_score = 0
+
+    # Resume sections
+    quality_score += len(sections) * 10
+
+    # Technical domains
+    quality_score += len(detected_domains) * 5
+
+    # Technical skills
+    quality_score += min(len(resume_skills) * 2, 20)
+
+    # Resume length
+
+    if word_count >= 300:
+        quality_score += 15
+    elif word_count >= 200:
+        quality_score += 10
+    elif word_count >= 100:
+        quality_score += 5
+
+    quality_score = min(quality_score, 100)
 
     ats_score = 0
     ats_score += len(sections) * 10
@@ -203,9 +235,48 @@ def upload():
 
     ats_score = min(ats_score, 100)
 
+    # Resume Grade
+
+    if quality_score >= 95:
+        resume_grade = "A+"
+    elif quality_score >= 90:
+        resume_grade = "A"
+    elif quality_score >= 80:
+        resume_grade = "B"
+    elif quality_score >= 70:
+        resume_grade = "C"
+    else:
+        resume_grade = "D"
+
+    # Hiring Recommendation
+
+    overall_score = round(
+        (match_score * 0.5) +
+        (ats_score * 0.25) +
+        (quality_score * 0.25))
+
+    if overall_score >= 90:
+        hiring_recommendation = "Strongly Recommended"
+    elif overall_score >= 75:
+        hiring_recommendation = "Recommended"
+    elif overall_score >= 60:
+        hiring_recommendation = "Consider for Interview"
+    else:
+        hiring_recommendation = "Needs Improvement"
+
     matched_areas = []
     strengths = []
-    recommendations = [f"Develop experience in {s}." for s in missing_skills]
+    # Generate recommendations based on missing skills
+    recommendations = [
+        f"Develop experience in {s}."
+        for s in missing_skills
+    ]
+
+    # If resume already matches well, provide positive feedback
+    if not recommendations:
+        recommendations.append(
+            "Your resume aligns well with the job requirements."
+        )
 
     return render_template(
         "index.html",
@@ -226,11 +297,18 @@ def upload():
         summary=summary,
         matched_areas=matched_areas,
         sections=sections,
-        candidate_profile=resume_skills,
+        candidate_profile=[
+            predicted_career,
+            f"{skills_count} skills detected",
+            f"{domain_count} domains detected",
+            f"{career_confidence}% confidence"
+        ],
         word_count=word_count,
         skills_count=skills_count,
         domain_count=domain_count,
         semantic_score=semantic_score,
+        resume_grade=resume_grade,
+        hiring_recommendation=hiring_recommendation,
         skills_match_score=skills_match_score,
         top_careers=top_careers,
         skill_categories=skill_categories
