@@ -2,490 +2,466 @@
 <html>
 <head>
     <title>Resume Job Matcher</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <div class="header-container">
+<div class="header-container">
+    <h1>Resume Job Matcher</h1>
+    <button type="button" id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
+</div>
 
-        <h1>Resume Job Matcher</h1>
+{% if error %}
+<p class="error-message">{{ error }}</p>
+{% endif %}
 
-        <button
-            type="button"
-            id="themeToggle"
-            class="theme-btn">
+<p class="subtitle">Upload a resume and compare it against a job description.</p>
 
-            🌙 Dark Mode
+<hr>
 
-        </button>
+<form action="/upload" method="POST" enctype="multipart/form-data">
 
-    </div>
+<h2 class="section-title">Resume Upload</h2>
 
-    {% if error %}
+<div class="upload-container">
+<label for="resume" class="upload-box" id="uploadBox">
+<span class="upload-text" id="uploadText">📄 Click to Upload Resume PDF</span>
+</label>
 
-    <p class="error-message">
-        {{ error }}
-    </p>
+<input type="file" id="resume" name="resume" accept=".pdf" required>
+</div>
 
-    {% endif %}
+<br><br>
 
-    <p class="subtitle">
-        Upload a resume and compare it against a job description.
-    </p>
+<h2 class="section-title">Job Description</h2>
 
-    <hr>
+<textarea name="job_description" rows="12" cols="80"
+placeholder="Paste the job description here..."></textarea>
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
+<br><br>
 
-        <h2 class="section-title">Resume Upload</h2>
+<button type="submit">Analyze Resume</button>
 
-        <div class="upload-container">
+</form>
 
-            <label for="resume" class="upload-box" id="uploadBox">
+<hr>
 
-                <span class="upload-text" id="uploadText">
-                    📄 Click to Upload Resume PDF
-                </span>
+<div class="results-container">
 
-            </label>
+<h2 class="section-title">Resume Analysis Dashboard</h2>
 
-            <input
-                type="file"
-                id="resume"
-                name="resume"
-                accept=".pdf"
-                required
-            >
+<div class="dashboard-grid metrics-grid">
 
-        </div>
-
-        <br><br>
-
-        <h2 class="section-title">Job Description</h2>
-
-        <textarea
-            name="job_description"
-            rows="12"
-            cols="80"
-            placeholder="Paste the job description here..."
-        ></textarea>
-
-        <br><br>
-
-        <button type="submit">
-            Analyze Resume
-        </button>
-
-    </form>
-
-    <hr>
-
-    <div class="results-container">
-
-    <h2 class="section-title">Analysis Results</h2>
-
-    <hr>
-
-    <div class="result-card">
+<div class="dashboard-card metric-card">
 
     <h3>Match Score</h3>
 
-    <p>
+    <div class="metric-number">
         {{ match_score if match_score is defined else 0 }}%
-    </p>
-
     </div>
 
-    <hr>
-
-    <p>
+    <p class="score-rating">
         {{ match_rating if match_rating is defined else "Not Available" }}
     </p>
 
-    <hr>
-    <div class="result-card">
+    <div class="progress-container">
 
-    <h3>Resume Quality Score</h3>
-
-    <p>
-        {{ quality_score if quality_score is defined else 0 }}/100
-    </p>
+        <div
+            class="progress-bar
+            {% if (match_score|default(0)) >= 80 %}
+                progress-good
+            {% elif (match_score|default(0)) >= 60 %}
+                progress-warning
+            {% else %}
+                progress-danger
+            {% endif %}"
+            style="width: {{ match_score if match_score is defined else 0 }}%">
+        </div>
 
     </div>
 
-    <hr>
+</div>
 
-    <div class="result-card">
+<div class="dashboard-card metric-card">
+
+    <h3>ATS Score</h3>
+
+    <div class="metric-number">
+        {{ ats_score if ats_score is defined else 0 }}
+    </div>
+
+    <p class="score-rating">
+        ATS Compatibility
+    </p>
+
+    <div class="progress-container">
+
+        <div
+            class="progress-bar
+            {% if (ats_score|default(0)) >= 80 %}
+                progress-good
+            {% elif (ats_score|default(0)) >= 60 %}
+                progress-warning
+            {% else %}
+                progress-danger
+            {% endif %}"
+            style="width: {{ ats_score if ats_score is defined else 0 }}%">
+        </div>
+
+    </div>
+
+</div>
+
+<div class="dashboard-card metric-card">
+
+    <h3>Resume Quality</h3>
+
+    <div class="metric-number">
+        {{ quality_score if quality_score is defined else 0 }}%
+    </div>
+
+    <p class="score-rating">
+        Resume Quality Score
+    </p>
+
+    <div class="progress-container">
+
+        <div
+            class="progress-bar
+            {% if (quality_score|default(0)) >= 80 %}
+                progress-good
+            {% elif (quality_score|default(0)) >= 60 %}
+                progress-warning
+            {% else %}
+                progress-danger
+            {% endif %}"
+            style="width: {{ quality_score if quality_score is defined else 0 }}%">
+        </div>
+
+    </div>
+
+</div>
+
+<div class="dashboard-card metric-card resume-grade-card">
 
     <h3>Resume Grade</h3>
 
-    <p>
-        {{ resume_grade if resume_grade is defined else "N/A" }}
-    </p>
-
+    <div class="resume-grade
+        {% if resume_grade.startswith('A') %}
+        grade-a
+        {% elif resume_grade == 'B' %}
+        grade-b
+        {% elif resume_grade == 'C' %}
+        grade-c
+        {% else %}
+        grade-d
+        {% endif %}">
+            {{ resume_grade }}
     </div>
 
-    <hr>
-    <div class="result-card">
-    <h3>ATS Compatibility Score</h3>
+</div>
 
-    <p>
-        {{ ats_score if ats_score is defined else 0 }}/100
-    </p>
-    
-    </div>
-
-    <hr>
-
-    <div class="result-card">
+<div class="dashboard-card metric-card">
 
     <h3>Hiring Recommendation</h3>
 
-    <p>
+    <div class="metric-text">
         {{ hiring_recommendation if hiring_recommendation is defined else "N/A" }}
+    </div>
+
+    <p class="recommendation-reason">
+        {{ hiring_reason if hiring_reason is defined else "" }}
     </p>
 
-    </div>
+</div>
 
-    <hr>
+</div>
 
-    <h3>Score Breakdown</h3>
+<div class="dashboard-section">
 
-    <ul>
-        <li>
-            Semantic Match:
-            {{ semantic_score if semantic_score is defined else 0 }}%
-        </li>
+    <h2 class="dashboard-section-title">
+        Analytics Dashboard
+    </h2>
 
-        <li>
-            Skills Match:
-            {{ skills_match_score if skills_match_score is defined else 0 }}%
-        </li>
+    <div class="analytics-layout">
 
-        <li>
-            ATS Score:
-            {{ ats_score if ats_score is defined else 0 }}%
-        </li>
-    </ul>
+        <div class="dashboard-card analytics-card">
 
-    <hr>
+            <h3>Score Distribution</h3>
 
-    <h3>Resume Statistics</h3>
+            <canvas id="scoreChart"></canvas>
 
-    <ul>
-        <li>Words: {{ word_count if word_count is defined else 0 }}</li>
-        <li>Skills Found: {{ skills_count if skills_count is defined else 0 }}</li>
-        <li>Domains Detected: {{ domain_count if domain_count is defined else 0 }}</li>
-    </ul>
+        </div>
 
-    <hr>
-    <div class="result-card">
+        <div class="dashboard-card analytics-card">
 
-    <h3>Predicted Career Path</h3>
+            <h3>Skills Analysis</h3>
 
-    <p>
-        {{ predicted_career if predicted_career is defined else "Not Available" }}
-    </p>
+            <canvas id="skillsChart"></canvas>
+
+        </div>
 
     </div>
 
-    <h3>Suitable Career Paths</h3>
+</div>
 
-    <ul>
+<div class="dashboard-section">
 
-    {% if top_careers %}
+    <h2 class="dashboard-section-title">
+        Career Intelligence
+    </h2>
 
-        {% for career in top_careers %}
-            <li>{{ career }}</li>
-        {% endfor %}
+    <div class="dashboard-grid metrics-grid">
 
-    {% else %}
+        <div class="dashboard-card metric-card">
 
-        <li>No career paths detected</li>
+            <h4>Resume Statistics</h4>
 
-    {% endif %}
+            <div class="stats-row">
 
-    </ul>
+                <div class="stat-box">
 
-    <hr>
+                    <div class="stat-number">
+                        {{ word_count }}
+                    </div>
 
-    <p>
-        Confidence:
-        {{ career_confidence if career_confidence is defined else 0 }}%
-    </p>
+                    <div class="stat-label">
+                        Words
+                    </div>
 
-    <hr>
+                </div>
 
-    <h3>Detected Resume Sections</h3>
+                <div class="stat-box">
 
-    <ul>
+                    <div class="stat-number">
+                        {{ skills_count }}
+                    </div>
 
-    {% if sections %}
+                    <div class="stat-label">
+                        Skills
+                    </div>
 
-        {% for section in sections %}
-            <li>{{ section }}</li>
-        {% endfor %}
+                </div>
 
-    {% else %}
+                <div class="stat-box">
 
-        <li>No sections detected</li>
+                    <div class="stat-number">
+                        {{ domain_count }}
+                    </div>
 
-    {% endif %}
+                    <div class="stat-label">
+                        Domains
+                    </div>
 
-    </ul>
+                </div>
 
-    <hr>
+            </div>
 
-    <div class="result-card">
+        </div>
 
-    <h3>Technical Domains</h3>
+        <div class="dashboard-card metric-card">
 
-    <ul>
+            <h4>Career Path</h4>
 
-    {% if detected_domains %}
+            <div class="metric-text">
+                {{ predicted_career if predicted_career is defined else "Not Available" }}
+            </div>
 
-        {% for domain in detected_domains %}
-            <li>{{ domain }}</li>
-        {% endfor %}
+            <p class="score-rating">
+                Confidence:
+                {{ career_confidence if career_confidence is defined else 0 }}%
+            </p>
 
-    {% else %}
+        </div>
 
-        <li>No domains detected</li>
+        <div class="dashboard-card metric-card">
 
-    {% endif %}
+            <h4>Technical Domains</h4>
 
-    </ul>
+            <div class="skills-container">
+
+                {% if detected_domains %}
+
+                    {% for domain in detected_domains %}
+
+                        <span class="skill-badge skill-match">
+                            {{ domain }}
+                        </span>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <span class="skill-badge">
+                        No domains detected
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card metric-card">
+
+            <h4>Candidate Profile</h4>
+
+            <div class="profile-list">
+
+                {% if candidate_profile %}
+
+                    {% for item in candidate_profile %}
+
+                        <div class="profile-item">
+                            {{ item }}
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="profile-item">
+                        No profile generated
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
 
     </div>
 
-    <hr>
-    <div class="result-card">
+</div>
 
-    <h3>Candidate Profile</h3>
+<div class="dashboard-section">
 
-    <ul>
+    <h2 class="dashboard-section-title">
+        Skills Analysis
+    </h2>
 
-    {% if candidate_profile %}
+    <div class="skills-analysis-grid">
 
-        {% for item in candidate_profile %}
-            <li>{{ item }}</li>
-        {% endfor %}
+        <div class="dashboard-card">
 
-    {% else %}
+            <h3>Matching Skills</h3>
 
-        <li>No profile generated</li>
+            <div class="skills-container">
 
-    {% endif %}
+            {% if matching_skills %}
 
-    </ul>
+                {% for skill in matching_skills %}
+
+                    <span class="skill-badge skill-match">
+                        ✓ {{ skill }}
+                    </span>
+
+                {% endfor %}
+
+            {% else %}
+
+                <span class="skill-badge">
+                    No matching skills found
+                </span>
+
+            {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+            <h3>Missing Skills</h3>
+
+            <div class="skills-container">
+
+            {% if missing_skills %}
+
+                {% for skill in missing_skills %}
+
+                    <span class="skill-badge skill-missing">
+                        ✗ {{ skill }}
+                    </span>
+
+                {% endfor %}
+
+            {% else %}
+
+                <span class="skill-badge">
+                    No missing skills
+                </span>
+
+            {% endif %}
+
+            </div>
+
+        </div>
 
     </div>
 
-    <hr>
+</div>
 
-    <h3>Resume Summary</h3>
+<div class="result-card">
+<h3>Priority Actions</h3>
+<ul>
+{% for recommendation in recommendations %}
+<li>{{ recommendation }}</li>
+{% endfor %}
+</ul>
+</div>
 
-    <ul>
+<div class="result-card">
 
-    {% if summary %}
+    <div class="preview-header">
 
-        {% for item in summary %}
-            <li>{{ item }}</li>
-        {% endfor %}
+        <h3>Resume Preview</h3>
 
-    {% else %}
+        <button
+            type="button"
+            id="togglePreview"
+            class="preview-btn">
 
-        <li>No summary generated</li>
+            Hide Preview
 
-    {% endif %}
+        </button>
 
-    </ul>
-
-    <hr>
-
-    <h3>Why This Score?</h3>
-
-    <ul>
-
-    {% if matched_areas %}
-
-        {% for item in matched_areas %}
-            <li>{{ item }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No matching technical areas detected</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h2 class="section-title">Skill Categories</h2>
-
-    {% for category, skills in skill_categories.items() %}
-
-    <h4>{{ category }}</h4>
-
-    <ul>
-
-    {% if skills %}
-
-        {% for skill in skills %}
-            <li>{{ skill }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No skills detected</li>
-
-    {% endif %}
-
-    </ul>
-
-    {% endfor %}
-
-    <hr>
-
-    <h3>Skills Found</h3>
-
-    <ul>
-
-    {% if resume_skills %}
-
-        {% for skill in resume_skills %}
-            <li>{{ skill }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No skills detected</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h3>Matching Skills</h3>
-
-    <ul>
-
-    {% if matching_skills %}
-
-        {% for skill in matching_skills %}
-            <li>{{ skill }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No matching skills</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h3>Missing Skills</h3>
-
-    <ul>
-
-    {% if missing_skills %}
-
-        {% for skill in missing_skills %}
-            <li>{{ skill }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No missing skills</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h3>Top Keywords</h3>
-
-    <ul>
-
-    {% if top_keywords %}
-
-        {% for keyword in top_keywords %}
-            <li>{{ keyword }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No keywords detected</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h3>Strengths</h3>
-
-    <ul>
-
-    {% if strengths %}
-
-        {% for strength in strengths %}
-            <li>{{ strength }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No strengths detected</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h3>Recommendations</h3>
-
-    <ul>
-
-    {% if recommendations %}
-
-        {% for recommendation in recommendations %}
-            <li>{{ recommendation }}</li>
-        {% endfor %}
-
-    {% else %}
-
-        <li>No recommendations available</li>
-
-    {% endif %}
-
-    </ul>
-
-    <hr>
-
-    <h2 class="section-title">Resume Preview</h2>
-
-    <textarea
-        rows="20"
-        cols="100"
-        readonly>{{ resume_text if resume_text is defined else "" }}</textarea>
-
-    
     </div>
 
-    <script
-    src="{{ url_for('static', filename='js/main.js') }}">
-    </script>
+    <div id="resumePreviewContainer">
+
+        <textarea
+            rows="20"
+            readonly>{{ resume_text if resume_text is defined else "" }}</textarea>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+window.matchScore =
+{{ match_score | default(0) }};
+
+window.atsScore =
+{{ ats_score | default(0) }};
+
+window.qualityScore =
+{{ quality_score | default(0) }};
+
+window.skillsMatchScore =
+{{ skills_match_score | default(0) }};
+
+window.missingSkillsCount =
+{{ missing_skills | length if missing_skills else 0 }};
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 </body>
 </html>

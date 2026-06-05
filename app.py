@@ -42,8 +42,32 @@ CAREER_PATHS = {
 
 @app.route("/")
 def home():
+
     return render_template(
         "index.html",
+
+        match_score=0,
+        ats_score=0,
+        quality_score=0,
+        semantic_score=0,
+        skills_match_score=0,
+
+        match_rating="Not Available",
+        resume_grade="N/A",
+        hiring_recommendation="N/A",
+        hiring_reason="",
+
+        predicted_career="Not Available",
+        career_confidence=0,
+
+        word_count=0,
+        skills_count=0,
+        domain_count=0,
+
+        resume_skills=[],
+        matching_skills=[],
+        missing_skills=[],
+
         skill_categories={},
         top_careers=[],
         sections=[],
@@ -52,7 +76,9 @@ def home():
         summary=[],
         matched_areas=[],
         strengths=[],
-        recommendations=[]
+        recommendations=[],
+        top_keywords=[],
+        resume_text=""
     )
 
 @app.route("/upload", methods=["POST"])
@@ -257,18 +283,25 @@ def upload():
 
     if overall_score >= 90:
         hiring_recommendation = "Strongly Recommended"
+        hiring_reason = "Excellent match, strong ATS score, and high resume quality."
+
     elif overall_score >= 75:
         hiring_recommendation = "Recommended"
+        hiring_reason = "Good alignment with job requirements and strong overall profile."
+
     elif overall_score >= 60:
         hiring_recommendation = "Consider for Interview"
+        hiring_reason = "Shows potential but has several skill gaps."
+
     else:
         hiring_recommendation = "Needs Improvement"
+        hiring_reason = "Resume requires additional skills and stronger alignment with the job."
 
     matched_areas = []
     strengths = []
     # Generate recommendations based on missing skills
     recommendations = [
-        f"Develop experience in {s}."
+        f"Add a project demonstrating {s}."
         for s in missing_skills
     ]
 
@@ -309,6 +342,7 @@ def upload():
         semantic_score=semantic_score,
         resume_grade=resume_grade,
         hiring_recommendation=hiring_recommendation,
+        hiring_reason=hiring_reason,
         skills_match_score=skills_match_score,
         top_careers=top_careers,
         skill_categories=skill_categories
