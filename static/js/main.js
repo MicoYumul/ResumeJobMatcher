@@ -75,6 +75,61 @@ if (themeToggle) {
 
 }
 
+let originalRows = null;
+let activeSortColumn = null;
+
+function sortTable(columnIndex) {
+
+    const table = document.querySelector(".history-table");
+
+    if (!table) return;
+
+    const tbody = table.querySelector("tbody");
+
+    if (!originalRows) {
+        originalRows = Array.from(
+            tbody.querySelectorAll("tr")
+        );
+    }
+
+    if (activeSortColumn === columnIndex) {
+
+        tbody.innerHTML = "";
+
+        originalRows.forEach(row => {
+            tbody.appendChild(row);
+        });
+
+        activeSortColumn = null;
+        return;
+    }
+
+    let rows = Array.from(
+        tbody.querySelectorAll("tr")
+    );
+
+    rows.sort((a, b) => {
+
+        const aValue = parseInt(
+            a.cells[columnIndex].textContent.replace("%", "")
+        );
+
+        const bValue = parseInt(
+            b.cells[columnIndex].textContent.replace("%", "")
+        );
+
+        return bValue - aValue;
+
+    });
+
+    tbody.innerHTML = "";
+
+    rows.forEach(row => {
+        tbody.appendChild(row);
+    });
+
+    activeSortColumn = columnIndex;
+}
 
 // =========================================
 // Dashboard Charts

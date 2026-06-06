@@ -177,6 +177,22 @@ placeholder="Paste the job description here..."></textarea>
 
 </div>
 
+{% if match_score > 0 %}
+
+<div class="action-buttons">
+
+    <a href="/download-report" class="btn btn-primary">
+        📄 Download PDF Report
+    </a>
+
+    <a href="/history" class="btn btn-secondary">
+        📊 View History
+    </a>
+
+</div>
+
+{% endif %}
+
 <div class="dashboard-section">
 
     <h2 class="dashboard-section-title">

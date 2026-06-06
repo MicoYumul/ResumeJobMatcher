@@ -3,15 +3,28 @@
 # RESUME JOB MATCHER
 # =========================================
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file, redirect, session
 import pdfplumber
 import re
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
 from collections import Counter
+from pdf_export import generate_pdf
+
+from database import (
+    init_db,
+    save_analysis,
+    get_all_analyses,
+    delete_analysis,
+    get_statistics
+)
+
+latest_analysis = {}
 
 app = Flask(__name__)
+app.secret_key = "resume_job_matcher_secret_key"
+init_db()
 
 # Load NLP model once at startup
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -42,6 +55,14 @@ CAREER_PATHS = {
 
 @app.route("/")
 def home():
+
+    analysis = session.get("analysis")
+
+    if analysis:
+        return render_template(
+            "index.html",
+            **analysis
+        )
 
     return render_template(
         "index.html",
@@ -79,6 +100,19 @@ def home():
         recommendations=[],
         top_keywords=[],
         resume_text=""
+    )
+
+@app.route("/history")
+def history():
+
+    analyses = get_all_analyses()
+
+    stats = get_statistics()
+
+    return render_template(
+        "history.html",
+        analyses=analyses,
+        stats=stats
     )
 
 @app.route("/upload", methods=["POST"])
@@ -310,6 +344,74 @@ def upload():
         recommendations.append(
             "Your resume aligns well with the job requirements."
         )
+    
+    session["analysis"] = {
+        "match_score": match_score,
+        "ats_score": ats_score,
+        "quality_score": quality_score,
+        "semantic_score": semantic_score,
+        "skills_match_score": skills_match_score,
+
+        "match_rating": match_rating,
+        "resume_grade": resume_grade,
+        "hiring_recommendation": hiring_recommendation,
+        "hiring_reason": hiring_reason,
+
+        "predicted_career": predicted_career,
+        "career_confidence": career_confidence,
+
+        "word_count": word_count,
+        "skills_count": skills_count,
+        "domain_count": domain_count,
+
+        "resume_skills": resume_skills,
+        "matching_skills": matching_skills,
+        "missing_skills": missing_skills,
+
+        "skill_categories": skill_categories,
+        "top_careers": top_careers,
+        "sections": sections,
+
+        "candidate_profile": [
+            predicted_career,
+            f"{skills_count} skills detected",
+            f"{domain_count} domains detected",
+            f"{career_confidence}% confidence"
+        ],
+
+        "detected_domains": detected_domains,
+        "summary": summary,
+        "matched_areas": matched_areas,
+        "strengths": strengths,
+        "recommendations": recommendations,
+        "top_keywords": top_keywords,
+        "resume_text": resume_text
+    }
+    
+    global latest_analysis
+
+    latest_analysis = {
+        "predicted_career": predicted_career,
+        "match_score": match_score,
+        "ats_score": ats_score,
+        "quality_score": quality_score,
+        "resume_grade": resume_grade,
+        "hiring_recommendation": hiring_recommendation,
+        "matching_skills": matching_skills,
+        "missing_skills": missing_skills,
+        "recommendations": recommendations
+    }
+    
+    save_analysis(
+        predicted_career,
+        match_score,
+        ats_score,
+        quality_score,
+        resume_grade,
+        hiring_recommendation,
+        skills_count,
+        domain_count
+    )
 
     return render_template(
         "index.html",
@@ -347,6 +449,28 @@ def upload():
         top_careers=top_careers,
         skill_categories=skill_categories
     )
+
+@app.route("/download-report")
+def download_report():
+
+    filepath = "reports/resume_analysis_report.pdf"
+
+    generate_pdf(
+        filepath,
+        latest_analysis
+    )
+
+    return send_file(
+        filepath,
+        as_attachment=True
+    )
+
+@app.route("/delete/<int:record_id>")
+def delete_record(record_id):
+
+    delete_analysis(record_id)
+
+    return redirect("/history")
 
 if __name__ == "__main__":
     app.run(debug=True)

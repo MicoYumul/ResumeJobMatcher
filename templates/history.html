@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis History</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header-container">
+
+        <h1>Resume Analysis History</h1>
+
+        <a href="/" class="btn btn-primary">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+    <div class="dashboard-grid metrics-grid">
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Total Analyses</h3>
+
+        <div class="metric-number">
+            {{ stats[0] or 0 }}
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Average Match</h3>
+
+        <div class="metric-number">
+            {{ "%.1f"|format(stats[1] or 0) }}%
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Average ATS</h3>
+
+        <div class="metric-number">
+            {{ "%.1f"|format(stats[2] or 0) }}%
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Average Quality</h3>
+
+        <div class="metric-number">
+            {{ "%.1f"|format(stats[3] or 0) }}%
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Best Match</h3>
+
+        <div class="metric-number">
+            {{ stats[4] or 0 }}%
+        </div>
+
+    </div>
+
+</div>
+
+    {% if analyses %}
+
+    <div class="dashboard-card">
+
+        <table class="history-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Date</th>
+
+                    <th>Career</th>
+
+                    <th onclick="sortTable(3)">
+                        Match Score ⬍
+                    </th>
+
+                    <th onclick="sortTable(4)">
+                        ATS Score ⬍
+                    </th>
+
+                    <th onclick="sortTable(5)">
+                        Quality Score ⬍
+                    </th>
+
+                    <th>Grade</th>
+
+                    <th>Recommendation</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for row in analyses %}
+
+                <tr>
+
+                    <td>{{ row[0] }}</td>
+
+                    <td>{{ row[1] }}</td>
+
+                    <td>{{ row[2] }}</td>
+
+                    <td>{{ row[3] }}%</td>
+
+                    <td>{{ row[4] }}%</td>
+
+                    <td>{{ row[5] }}%</td>
+
+                    <td>{{ row[6] }}</td>
+
+                    <td>{{ row[7] }}</td>
+
+                    <td>
+
+                        <a href="/delete/{{ row[0] }}"
+                           class="delete-btn"
+                           onclick="return confirm('Delete this analysis?');">
+
+                            Delete
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+    <div class="dashboard-card">
+
+        <h3>No Analysis History Found</h3>
+
+        <p>
+            Analyze a resume to create your first report.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
