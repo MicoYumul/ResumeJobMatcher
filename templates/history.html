@@ -22,7 +22,7 @@
 
     </div>
 
-    <div class="dashboard-grid metrics-grid">
+<div class="dashboard-grid history-metrics-grid">
 
     <div class="dashboard-card metric-card">
 
@@ -90,6 +90,8 @@
 
                     <th>Date</th>
 
+                    <th>Resume</th>
+
                     <th>Career</th>
 
                     <th onclick="sortTable(3)">
@@ -120,21 +122,23 @@
 
                 <tr>
 
-                    <td>{{ row[0] }}</td>
+                    <td>{{ row[0] }}</td> <!-- ID -->
 
-                    <td>{{ row[1] }}</td>
+                    <td>{{ row[1] }}</td> <!-- Date -->
 
-                    <td>{{ row[2] }}</td>
+                    <td>{{ row[2] }}</td> <!-- Resume Name -->
 
-                    <td>{{ row[3] }}%</td>
+                    <td>{{ row[3] }}</td> <!-- Career -->
 
-                    <td>{{ row[4] }}%</td>
+                    <td>{{ row[4] }}%</td> <!-- Match Score -->
 
-                    <td>{{ row[5] }}%</td>
+                    <td>{{ row[5] }}%</td> <!-- ATS Score -->
 
-                    <td>{{ row[6] }}</td>
+                    <td>{{ row[6] }}%</td> <!-- Quality Score -->
 
-                    <td>{{ row[7] }}</td>
+                    <td>{{ row[7] }}</td> <!-- Resume Grade -->
+
+                    <td>{{ row[8] }}</td> <!-- Hiring Recommendation -->
 
                     <td>
 

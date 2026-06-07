@@ -1,273 +1,352 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Resume Job Matcher</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Resume Job Matcher</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
 
-<div class="header-container">
-    <h1>Resume Job Matcher</h1>
-    <button type="button" id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
-</div>
-
-{% if error %}
-<p class="error-message">{{ error }}</p>
-{% endif %}
-
-<p class="subtitle">Upload a resume and compare it against a job description.</p>
-
-<hr>
-
-<form action="/upload" method="POST" enctype="multipart/form-data">
-
-<h2 class="section-title">Resume Upload</h2>
-
-<div class="upload-container">
-<label for="resume" class="upload-box" id="uploadBox">
-<span class="upload-text" id="uploadText">📄 Click to Upload Resume PDF</span>
-</label>
-
-<input type="file" id="resume" name="resume" accept=".pdf" required>
-</div>
-
-<br><br>
-
-<h2 class="section-title">Job Description</h2>
-
-<textarea name="job_description" rows="12" cols="80"
-placeholder="Paste the job description here..."></textarea>
-
-<br><br>
-
-<button type="submit">Analyze Resume</button>
-
-</form>
-
-<hr>
-
-<div class="results-container">
-
-<h2 class="section-title">Resume Analysis Dashboard</h2>
-
-<div class="dashboard-grid metrics-grid">
-
-<div class="dashboard-card metric-card">
-
-    <h3>Match Score</h3>
-
-    <div class="metric-number">
-        {{ match_score if match_score is defined else 0 }}%
+    <div class="header-container">
+        <h1>Resume Job Matcher</h1>
+        <button type="button" id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
     </div>
 
-    <p class="score-rating">
-        {{ match_rating if match_rating is defined else "Not Available" }}
-    </p>
+    {% if error %}
+    <p class="error-message">{{ error }}</p>
+    {% endif %}
 
-    <div class="progress-container">
+    <p class="subtitle">Upload a resume and compare it against a job description.</p>
 
-        <div
-            class="progress-bar
-            {% if (match_score|default(0)) >= 80 %}
-                progress-good
-            {% elif (match_score|default(0)) >= 60 %}
-                progress-warning
+    <hr>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+
+    <h2 class="section-title">Resume Upload</h2>
+
+    <div class="upload-container">
+    <label for="resume" class="upload-box" id="uploadBox">
+    <span class="upload-text" id="uploadText">📄 Click to Upload Resume PDF</span>
+    </label>
+
+    <input type="file" id="resume" name="resume" accept=".pdf" required>
+    </div>
+
+    <br><br>
+
+    <h2 class="section-title">Job Description</h2>
+
+    <textarea name="job_description" rows="12" cols="80"
+    placeholder="Paste the job description here..."></textarea>
+
+    <br><br>
+
+    <button type="submit">Analyze Resume</button>
+
+    </form>
+
+    <hr>
+
+    {% if analysis_complete %}
+
+    <div class="results-container">
+
+    <h2 class="section-title">Resume Analysis Dashboard</h2>
+
+    <div class="dashboard-grid top-metrics-grid">
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Match Score</h3>
+
+        <div class="metric-number">
+            {{ match_score if match_score is defined else 0 }}%
+        </div>
+
+        <p class="score-rating">
+            {{ match_rating if match_rating is defined else "Not Available" }}
+        </p>
+
+        <div class="progress-container">
+
+            <div
+                class="progress-bar
+                {% if (match_score|default(0)) >= 80 %}
+                    progress-good
+                {% elif (match_score|default(0)) >= 60 %}
+                    progress-warning
+                {% else %}
+                    progress-danger
+                {% endif %}"
+                style="width: {{ match_score if match_score is defined else 0 }}%">
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card">
+
+        <h3>ATS Score</h3>
+
+        <div class="metric-number">
+            {{ ats_score if ats_score is defined else 0 }}
+        </div>
+
+        <p class="score-rating">
+            ATS Compatibility
+        </p>
+
+        <div class="progress-container">
+
+            <div
+                class="progress-bar
+                {% if (ats_score|default(0)) >= 80 %}
+                    progress-good
+                {% elif (ats_score|default(0)) >= 60 %}
+                    progress-warning
+                {% else %}
+                    progress-danger
+                {% endif %}"
+                style="width: {{ ats_score if ats_score is defined else 0 }}%">
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card">
+
+        <h3>Resume Quality</h3>
+
+        <div class="metric-number">
+            {{ quality_score if quality_score is defined else 0 }}%
+        </div>
+
+        <p class="score-rating">
+            Resume Quality Score
+        </p>
+
+        <div class="progress-container">
+
+            <div
+                class="progress-bar
+                {% if (quality_score|default(0)) >= 80 %}
+                    progress-good
+                {% elif (quality_score|default(0)) >= 60 %}
+                    progress-warning
+                {% else %}
+                    progress-danger
+                {% endif %}"
+                style="width: {{ quality_score if quality_score is defined else 0 }}%">
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card metric-card resume-grade-card">
+
+        <h3>Resume Grade</h3>
+
+        <div class="resume-grade
+            {% if resume_grade.startswith('A') %}
+            grade-a
+            {% elif resume_grade == 'B' %}
+            grade-b
+            {% elif resume_grade == 'C' %}
+            grade-c
             {% else %}
-                progress-danger
-            {% endif %}"
-            style="width: {{ match_score if match_score is defined else 0 }}%">
+            grade-d
+            {% endif %}">
+                {{ resume_grade }}
         </div>
 
     </div>
 
-</div>
+    <div class="dashboard-card metric-card">
 
-<div class="dashboard-card metric-card">
+        <h3>Hiring Recommendation</h3>
 
-    <h3>ATS Score</h3>
-
-    <div class="metric-number">
-        {{ ats_score if ats_score is defined else 0 }}
-    </div>
-
-    <p class="score-rating">
-        ATS Compatibility
-    </p>
-
-    <div class="progress-container">
-
-        <div
-            class="progress-bar
-            {% if (ats_score|default(0)) >= 80 %}
-                progress-good
-            {% elif (ats_score|default(0)) >= 60 %}
-                progress-warning
-            {% else %}
-                progress-danger
-            {% endif %}"
-            style="width: {{ ats_score if ats_score is defined else 0 }}%">
+        <div class="metric-text">
+            {{ hiring_recommendation if hiring_recommendation is defined else "N/A" }}
         </div>
 
-    </div>
-
-</div>
-
-<div class="dashboard-card metric-card">
-
-    <h3>Resume Quality</h3>
-
-    <div class="metric-number">
-        {{ quality_score if quality_score is defined else 0 }}%
-    </div>
-
-    <p class="score-rating">
-        Resume Quality Score
-    </p>
-
-    <div class="progress-container">
-
-        <div
-            class="progress-bar
-            {% if (quality_score|default(0)) >= 80 %}
-                progress-good
-            {% elif (quality_score|default(0)) >= 60 %}
-                progress-warning
-            {% else %}
-                progress-danger
-            {% endif %}"
-            style="width: {{ quality_score if quality_score is defined else 0 }}%">
-        </div>
+        <p class="recommendation-reason">
+            {{ hiring_reason if hiring_reason is defined else "" }}
+        </p>
 
     </div>
 
-</div>
-
-<div class="dashboard-card metric-card resume-grade-card">
-
-    <h3>Resume Grade</h3>
-
-    <div class="resume-grade
-        {% if resume_grade.startswith('A') %}
-        grade-a
-        {% elif resume_grade == 'B' %}
-        grade-b
-        {% elif resume_grade == 'C' %}
-        grade-c
-        {% else %}
-        grade-d
-        {% endif %}">
-            {{ resume_grade }}
     </div>
 
-</div>
+    {% if match_score > 0 %}
 
-<div class="dashboard-card metric-card">
+    <div class="action-buttons">
 
-    <h3>Hiring Recommendation</h3>
+        <a href="/download-report" class="btn btn-primary">
+            📄 Download PDF Report
+        </a>
 
-    <div class="metric-text">
-        {{ hiring_recommendation if hiring_recommendation is defined else "N/A" }}
+        <a href="/history" class="btn btn-secondary">
+            📊 View History
+        </a>
+
+        <a href="/new-analysis" class="btn btn-secondary">
+            ➕ New Analysis
+        </a>
+
     </div>
 
-    <p class="recommendation-reason">
-        {{ hiring_reason if hiring_reason is defined else "" }}
-    </p>
+    {% endif %}
 
-</div>
+    <div class="dashboard-section">
 
-</div>
+        <h2 class="dashboard-section-title">
+            Analytics Dashboard
+        </h2>
 
-{% if match_score > 0 %}
+        <div class="analytics-layout">
 
-<div class="action-buttons">
+            <div class="dashboard-card analytics-card">
 
-    <a href="/download-report" class="btn btn-primary">
-        📄 Download PDF Report
-    </a>
+                <h3>Score Distribution</h3>
 
-    <a href="/history" class="btn btn-secondary">
-        📊 View History
-    </a>
+                <canvas id="scoreChart"></canvas>
 
-</div>
+            </div>
 
-{% endif %}
+            <div class="dashboard-card analytics-card">
 
-<div class="dashboard-section">
+                <h3>Skills Analysis</h3>
 
-    <h2 class="dashboard-section-title">
-        Analytics Dashboard
-    </h2>
+                <canvas id="skillsChart"></canvas>
 
-    <div class="analytics-layout">
-
-        <div class="dashboard-card analytics-card">
-
-            <h3>Score Distribution</h3>
-
-            <canvas id="scoreChart"></canvas>
-
-        </div>
-
-        <div class="dashboard-card analytics-card">
-
-            <h3>Skills Analysis</h3>
-
-            <canvas id="skillsChart"></canvas>
+            </div>
 
         </div>
 
     </div>
 
-</div>
+    <div class="dashboard-section">
 
-<div class="dashboard-section">
+        <h2 class="dashboard-section-title">
+            Career Intelligence
+        </h2>
 
-    <h2 class="dashboard-section-title">
-        Career Intelligence
-    </h2>
+        <div class="dashboard-grid metrics-grid">
 
-    <div class="dashboard-grid metrics-grid">
+            <div class="dashboard-card metric-card">
 
-        <div class="dashboard-card metric-card">
+                <h4>Resume Statistics</h4>
 
-            <h4>Resume Statistics</h4>
+                <div class="stats-row">
 
-            <div class="stats-row">
+                    <div class="stat-box">
 
-                <div class="stat-box">
+                        <div class="stat-number">
+                            {{ word_count }}
+                        </div>
 
-                    <div class="stat-number">
-                        {{ word_count }}
+                        <div class="stat-label">
+                            Words
+                        </div>
+
                     </div>
 
-                    <div class="stat-label">
-                        Words
+                    <div class="stat-box">
+
+                        <div class="stat-number">
+                            {{ skills_count }}
+                        </div>
+
+                        <div class="stat-label">
+                            Skills
+                        </div>
+
+                    </div>
+
+                    <div class="stat-box">
+
+                        <div class="stat-number">
+                            {{ domain_count }}
+                        </div>
+
+                        <div class="stat-label">
+                            Domains
+                        </div>
+
                     </div>
 
                 </div>
 
-                <div class="stat-box">
+            </div>
 
-                    <div class="stat-number">
-                        {{ skills_count }}
-                    </div>
+            <div class="dashboard-card metric-card">
 
-                    <div class="stat-label">
-                        Skills
-                    </div>
+                <h4>Career Path</h4>
+
+                <div class="metric-text">
+                    {{ predicted_career if predicted_career is defined else "Not Available" }}
+                </div>
+
+                <p class="score-rating">
+                    Confidence:
+                    {{ career_confidence if career_confidence is defined else 0 }}%
+                </p>
+
+            </div>
+
+            <div class="dashboard-card metric-card">
+
+                <h4>Technical Domains</h4>
+
+                <div class="skills-container">
+
+                    {% if detected_domains %}
+
+                        {% for domain in detected_domains %}
+
+                            <span class="skill-badge skill-match">
+                                {{ domain }}
+                            </span>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <span class="skill-badge">
+                            No domains detected
+                        </span>
+
+                    {% endif %}
 
                 </div>
 
-                <div class="stat-box">
+            </div>
 
-                    <div class="stat-number">
-                        {{ domain_count }}
-                    </div>
+            <div class="dashboard-card metric-card">
 
-                    <div class="stat-label">
-                        Domains
-                    </div>
+                <h4>Candidate Profile</h4>
+
+                <div class="profile-list">
+
+                    {% if candidate_profile %}
+
+                        {% for item in candidate_profile %}
+
+                            <div class="profile-item">
+                                {{ item }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="profile-item">
+                            No profile generated
+                        </div>
+
+                    {% endif %}
 
                 </div>
 
@@ -275,33 +354,28 @@ placeholder="Paste the job description here..."></textarea>
 
         </div>
 
-        <div class="dashboard-card metric-card">
+    </div>
 
-            <h4>Career Path</h4>
+    <div class="dashboard-section">
 
-            <div class="metric-text">
-                {{ predicted_career if predicted_career is defined else "Not Available" }}
-            </div>
+        <h2 class="dashboard-section-title">
+            Skills Analysis
+        </h2>
 
-            <p class="score-rating">
-                Confidence:
-                {{ career_confidence if career_confidence is defined else 0 }}%
-            </p>
+        <div class="skills-analysis-grid">
 
-        </div>
+            <div class="dashboard-card">
 
-        <div class="dashboard-card metric-card">
+                <h3>Matching Skills</h3>
 
-            <h4>Technical Domains</h4>
+                <div class="skills-container">
 
-            <div class="skills-container">
+                {% if matching_skills %}
 
-                {% if detected_domains %}
-
-                    {% for domain in detected_domains %}
+                    {% for skill in matching_skills %}
 
                         <span class="skill-badge skill-match">
-                            {{ domain }}
+                            ✓ {{ skill }}
                         </span>
 
                     {% endfor %}
@@ -309,106 +383,40 @@ placeholder="Paste the job description here..."></textarea>
                 {% else %}
 
                     <span class="skill-badge">
-                        No domains detected
+                        No matching skills found
                     </span>
 
                 {% endif %}
 
+                </div>
+
             </div>
 
-        </div>
+            <div class="dashboard-card">
 
-        <div class="dashboard-card metric-card">
+                <h3>Missing Skills</h3>
 
-            <h4>Candidate Profile</h4>
+                <div class="skills-container">
 
-            <div class="profile-list">
+                {% if missing_skills %}
 
-                {% if candidate_profile %}
+                    {% for skill in missing_skills %}
 
-                    {% for item in candidate_profile %}
-
-                        <div class="profile-item">
-                            {{ item }}
-                        </div>
+                        <span class="skill-badge skill-missing">
+                            ✗ {{ skill }}
+                        </span>
 
                     {% endfor %}
 
                 {% else %}
 
-                    <div class="profile-item">
-                        No profile generated
-                    </div>
+                    <span class="skill-badge">
+                        No missing skills
+                    </span>
 
                 {% endif %}
 
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="dashboard-section">
-
-    <h2 class="dashboard-section-title">
-        Skills Analysis
-    </h2>
-
-    <div class="skills-analysis-grid">
-
-        <div class="dashboard-card">
-
-            <h3>Matching Skills</h3>
-
-            <div class="skills-container">
-
-            {% if matching_skills %}
-
-                {% for skill in matching_skills %}
-
-                    <span class="skill-badge skill-match">
-                        ✓ {{ skill }}
-                    </span>
-
-                {% endfor %}
-
-            {% else %}
-
-                <span class="skill-badge">
-                    No matching skills found
-                </span>
-
-            {% endif %}
-
-            </div>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <h3>Missing Skills</h3>
-
-            <div class="skills-container">
-
-            {% if missing_skills %}
-
-                {% for skill in missing_skills %}
-
-                    <span class="skill-badge skill-missing">
-                        ✗ {{ skill }}
-                    </span>
-
-                {% endfor %}
-
-            {% else %}
-
-                <span class="skill-badge">
-                    No missing skills
-                </span>
-
-            {% endif %}
+                </div>
 
             </div>
 
@@ -416,68 +424,216 @@ placeholder="Paste the job description here..."></textarea>
 
     </div>
 
-</div>
+    <div class="dashboard-section">
 
-<div class="result-card">
-<h3>Priority Actions</h3>
-<ul>
-{% for recommendation in recommendations %}
-<li>{{ recommendation }}</li>
-{% endfor %}
-</ul>
-</div>
+        <h2 class="dashboard-section-title">
+            Job Gap Analysis
+        </h2>
 
-<div class="result-card">
+        <div class="dashboard-grid metrics-grid">
 
-    <div class="preview-header">
+            <div class="dashboard-card metric-card">
 
-        <h3>Resume Preview</h3>
+                <h3>Job Skill Match</h3>
 
-        <button
-            type="button"
-            id="togglePreview"
-            class="preview-btn">
+                <div class="metric-number
+                    {% if job_match_score >= 80 %}
+                        grade-a
+                    {% elif job_match_score >= 60 %}
+                        grade-b
+                    {% elif job_match_score >= 40 %}
+                        grade-c
+                    {% else %}
+                        grade-d
+                    {% endif %}
+                ">
+                    {{ job_match_score }}%
+                </div>
 
-            Hide Preview
+                <p class="score-rating">
 
-        </button>
+                    {% if job_match_score >= 80 %}
+                        Excellent Match
+                    {% elif job_match_score >= 60 %}
+                        Strong Match
+                    {% elif job_match_score >= 40 %}
+                        Partial Match
+                    {% else %}
+                        Weak Match
+                    {% endif %}
+
+                </p>
+
+                <div class="progress-container">
+
+                    <div
+                        class="progress-bar
+                        {% if job_match_score >= 80 %}
+                            progress-good
+                        {% elif job_match_score >= 60 %}
+                            progress-warning
+                        {% else %}
+                            progress-danger
+                        {% endif %}"
+                        style="width: {{ job_match_score }}%">
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <h3>Matching Job Skills</h3>
+
+                <div class="skills-container">
+
+                    {% if job_matching_skills %}
+
+                        {% for skill in job_matching_skills %}
+
+                            <span class="skill-badge skill-match">
+                                ✓ {{ skill }}
+                            </span>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <span class="skill-badge">
+                            No matching job skills found
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <h3>Missing Job Skills</h3>
+
+                <div class="skills-container">
+
+                    {% if job_missing_skills %}
+
+                        {% for skill in job_missing_skills %}
+
+                            <span class="skill-badge skill-missing">
+                                ✗ {{ skill }}
+                            </span>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <span class="skill-badge">
+                            No missing job skills
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <div class="dashboard-card">
+
+                <h3>Job Recommendations</h3>
+
+                <ul>
+
+                    {% for recommendation in job_recommendations %}
+
+                        <li>{{ recommendation }}</li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <div id="resumePreviewContainer">
+    <div class="result-card">
+    <h3>Priority Actions</h3>
+    <ul>
+    {% for recommendation in recommendations %}
+    <li>{{ recommendation }}</li>
+    {% endfor %}
+    </ul>
+    </div>
 
-        <textarea
-            rows="20"
-            readonly>{{ resume_text if resume_text is defined else "" }}</textarea>
+    <div class="result-card">
+
+        <div class="preview-header">
+
+            <h3>Resume Preview</h3>
+
+            <button
+                type="button"
+                id="togglePreview"
+                class="preview-btn">
+
+                Hide Preview
+
+            </button>
+
+        </div>
+
+        <div id="resumePreviewContainer">
+
+            <textarea
+                rows="20"
+                readonly>{{ resume_text if resume_text is defined else "" }}</textarea>
+
+        </div>
 
     </div>
 
-</div>
+    </div>
 
-</div>
+    {% else %}
 
-<script>
+    <div class="welcome-card">
 
-window.matchScore =
-{{ match_score | default(0) }};
+        <h2>Ready to Analyze Your Resume</h2>
 
-window.atsScore =
-{{ ats_score | default(0) }};
+        <p>
+            Upload a resume and paste a job description to generate
+            ATS scoring, semantic matching, skill gap analysis,
+            career intelligence, and a professional PDF report.
+        </p>
 
-window.qualityScore =
-{{ quality_score | default(0) }};
+    </div>
 
-window.skillsMatchScore =
-{{ skills_match_score | default(0) }};
+    {% endif %}
 
-window.missingSkillsCount =
-{{ missing_skills | length if missing_skills else 0 }};
+    <script>
 
-</script>
+    window.matchScore =
+    {{ match_score | default(0) }};
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    window.atsScore =
+    {{ ats_score | default(0) }};
 
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    window.qualityScore =
+    {{ quality_score | default(0) }};
 
-</body>
-</html>
+    window.skillsMatchScore =
+    {{ skills_match_score | default(0) }};
+
+    window.missingSkillsCount =
+    {{ missing_skills | length if missing_skills else 0 }};
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    </body>
+    </html>

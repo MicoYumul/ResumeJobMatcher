@@ -11,6 +11,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
 from collections import Counter
 from pdf_export import generate_pdf
+from analyzers.job_gap_analyzer import get_job_gap_analysis
+
 
 from database import (
     init_db,
@@ -66,40 +68,7 @@ def home():
 
     return render_template(
         "index.html",
-
-        match_score=0,
-        ats_score=0,
-        quality_score=0,
-        semantic_score=0,
-        skills_match_score=0,
-
-        match_rating="Not Available",
-        resume_grade="N/A",
-        hiring_recommendation="N/A",
-        hiring_reason="",
-
-        predicted_career="Not Available",
-        career_confidence=0,
-
-        word_count=0,
-        skills_count=0,
-        domain_count=0,
-
-        resume_skills=[],
-        matching_skills=[],
-        missing_skills=[],
-
-        skill_categories={},
-        top_careers=[],
-        sections=[],
-        candidate_profile=[],
-        detected_domains=[],
-        summary=[],
-        matched_areas=[],
-        strengths=[],
-        recommendations=[],
-        top_keywords=[],
-        resume_text=""
+        analysis_complete=False
     )
 
 @app.route("/history")
@@ -115,10 +84,18 @@ def history():
         stats=stats
     )
 
+@app.route("/new-analysis")
+def new_analysis():
+
+    session.pop("analysis", None)
+
+    return redirect("/")
+
 @app.route("/upload", methods=["POST"])
 def upload():
 
     file = request.files["resume"]
+    resume_name = file.filename.replace(".pdf", "")
     job_description = request.form["job_description"]
 
     resume_text = ""
@@ -131,6 +108,11 @@ def upload():
 
     resume_lower = resume_text.lower()
     job_lower = job_description.lower()
+
+    gap_analysis = get_job_gap_analysis(
+        resume_text,
+        job_description
+)
 
     # Skill Detection
     resume_skills = [s for s in SKILLS if re.search(r"\b" + re.escape(s) + r"\b", resume_lower)]
@@ -346,6 +328,10 @@ def upload():
         )
     
     session["analysis"] = {
+
+        "analysis_complete": True,
+
+
         "match_score": match_score,
         "ats_score": ats_score,
         "quality_score": quality_score,
@@ -368,6 +354,11 @@ def upload():
         "matching_skills": matching_skills,
         "missing_skills": missing_skills,
 
+        "job_match_score": gap_analysis["match_score"],
+        "job_matching_skills": gap_analysis["matching_skills"],
+        "job_missing_skills": gap_analysis["missing_skills"],
+        "job_recommendations": gap_analysis["recommendations"],
+
         "skill_categories": skill_categories,
         "top_careers": top_careers,
         "sections": sections,
@@ -387,7 +378,7 @@ def upload():
         "top_keywords": top_keywords,
         "resume_text": resume_text
     }
-    
+        
     global latest_analysis
 
     latest_analysis = {
@@ -403,6 +394,7 @@ def upload():
     }
     
     save_analysis(
+        resume_name,
         predicted_career,
         match_score,
         ats_score,
@@ -412,9 +404,11 @@ def upload():
         skills_count,
         domain_count
     )
-
     return render_template(
         "index.html",
+
+        analysis_complete=True,
+
         match_score=match_score,
         match_rating=match_rating,
         quality_score=quality_score,
@@ -447,6 +441,12 @@ def upload():
         hiring_reason=hiring_reason,
         skills_match_score=skills_match_score,
         top_careers=top_careers,
+
+        job_match_score=gap_analysis["match_score"],
+        job_matching_skills=gap_analysis["matching_skills"],
+        job_missing_skills=gap_analysis["missing_skills"],
+        job_recommendations=gap_analysis["recommendations"],
+
         skill_categories=skill_categories
     )
 
