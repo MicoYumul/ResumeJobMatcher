@@ -1,122 +1,63 @@
 # Resume Job Matcher & ATS Analyzer
 
-An AI-powered recruitment analytics platform that evaluates resumes against job descriptions using Natural Language Processing (NLP), semantic similarity analysis, ATS scoring, and career intelligence.
+An AI-powered Resume Job Matcher and ATS Analyzer built with Flask, Natural Language Processing, Machine Learning, and Semantic Similarity Analysis.
 
-## Overview
-
-Resume Job Matcher helps job seekers, recruiters, and hiring teams assess candidate suitability by comparing resumes with job requirements. The platform provides detailed insights including match scores, ATS compatibility, skill gap analysis, career predictions, and hiring recommendations through an interactive analytics dashboard.
-=======
-An AI-powered Resume Job Matcher and ATS Analyzer built with Flask, NLP, Machine Learning, and Semantic Similarity techniques.
-
-This application helps job seekers evaluate how well their resume aligns with a target job description by providing ATS analysis, semantic matching, skill gap detection, career insights, and professional reporting.
->>>>>>> 175a4a0 (Release v1.0 Resume Job Matcher ATS Analyzer)
+This application helps job seekers evaluate resume quality, measure compatibility with target job descriptions, identify skill gaps, and generate actionable recommendations through an interactive analytics dashboard.
 
 ## Features
 
 ### Resume Analysis
 
-* PDF resume upload and processing
-* Resume text extraction
-* Resume preview viewer
-* Resume quality assessment
-* Resume grading system
-
-### AI-Powered Job Matching
-
-* Semantic similarity matching
-* Match score calculation
-* Candidate suitability evaluation
-* Job description analysis
-* Hiring recommendation generation
-
-### ATS Analyzer
-
-* ATS compatibility scoring
-* Resume structure evaluation
-* Keyword matching analysis
-* Resume quality scoring
-
-### Skills Intelligence
-
-* Technical skill extraction
-* Matching skills detection
-* Missing skills identification
-* Skill gap analysis
-* Personalized recommendations
-=======
 * PDF Resume Upload
 * Resume Text Extraction
-* Resume Quality Analysis
+* Resume Preview
+* Resume Quality Assessment
 * Resume Quality Scoring
 * Resume Grading System
 * Hiring Recommendation Engine
-* Resume Preview
 
 ### ATS Analysis
 
 * ATS Compatibility Scoring
-* Keyword Analysis
 * Resume Optimization Insights
+* Keyword Analysis
 * ATS Readiness Evaluation
 
-### AI-Powered Matching
+### AI Job Matching
 
 * Semantic Job Matching
 * NLP-Based Similarity Analysis
-* Job Skill Match Scoring
-* Skill Gap Analysis
-* Missing Skills Detection
-* Matching Skills Detection
->>>>>>> 175a4a0 (Release v1.0 Resume Job Matcher ATS Analyzer)
+* Match Score Calculation
+* Skill Gap Detection
+* Matching Skills Identification
+* Missing Skills Analysis
+* Job Skill Match Score
 
 ### Career Intelligence
 
 * Career Path Prediction
-* Career Confidence Scoring
+* Career Confidence Analysis
 * Technical Domain Detection
 * Candidate Profile Generation
-* Skills Categorization
+* Skill Categorization
 
 ### Analytics Dashboard
 
-* Match Score visualization
-* ATS Score visualization
-* Resume Quality visualization
-* Interactive charts
-* Progress indicators
-* Candidate insights dashboard
-
-### History Management
-
-* SQLite database integration
-* Analysis history storage
-* Historical analysis dashboard
-* Analysis record deletion
-* Sortable score tables
-* Performance statistics
-=======
 * Match Score Visualization
 * ATS Score Visualization
 * Resume Quality Visualization
-* Resume Grade Display
+* Resume Grade Dashboard
 * Hiring Recommendation Dashboard
+* Career Intelligence Dashboard
 * Skills Analysis Charts
-* Career Analytics Dashboard
 
 ### History & Reporting
 
 * Analysis History Storage
 * Analysis Statistics Dashboard
 * Sortable Analysis Records
-* Professional PDF Report Export
+* PDF Report Export
 * Session-Based Dashboard Persistence
->>>>>>> 175a4a0 (Release v1.0 Resume Job Matcher ATS Analyzer)
-
-### Reporting
-
-* Professional PDF report generation
-* Downloadable analysis reports
-* Candidate evaluation summaries
 
 ## Technology Stack
 
@@ -131,158 +72,28 @@ This application helps job seekers evaluate how well their resume aligns with a 
 * Sentence Transformers
 * Scikit-learn
 * Natural Language Processing
-* Cosine Similarity Analysis
-=======
 * Semantic Similarity Matching
->>>>>>> 175a4a0 (Release v1.0 Resume Job Matcher ATS Analyzer)
 
 ### Frontend
 
 * HTML5
 * CSS3
 * JavaScript
-
-* Jinja2 Templates
-
-### Data Visualization
-
-* Chart.js
-=======
 * Chart.js
 
 ### Database
 
 * SQLite
->>>>>>> 175a4a0 (Release v1.0 Resume Job Matcher ATS Analyzer)
 
-### Document Processing
-
-* PDFPlumber
-* ReportLab
-
-## System Architecture
+## Project Architecture
 
 ```text
-
-Resume PDF
-     │
-     ▼
-Text Extraction
-     │
-     ▼
-Resume Analysis Engine
-     │
-     ├── Semantic Matching
-     ├── ATS Scoring
-     ├── Skill Detection
-     ├── Career Prediction
-     └── Resume Quality Assessment
-     │
-     ▼
-Analytics Dashboard
-     │
-     ├── Match Score
-     ├── ATS Score
-     ├── Skill Gap Analysis
-     ├── Career Intelligence
-     └── PDF Reports
-```
-
-## Installation
-
-### Clone Repository
-
-```bash
-git clone https://github.com/yourusername/resume-job-matcher.git
-cd resume-job-matcher
-```
-
-### Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-### Activate Environment
-
-Windows
-
-```bash
-venv\Scripts\activate
-```
-
-Linux / macOS
-
-```bash
-source venv/bin/activate
-```
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Run Application
-
-```bash
-python app.py
-```
-
-Open:
-
-```text
-http://127.0.0.1:5000
-```
-
-## Project Highlights
-
-* AI-powered resume screening
-* Semantic job matching engine
-* ATS compatibility analysis
-* Career prediction system
-* Interactive analytics dashboard
-* Historical analysis tracking
-* PDF report generation
-* Recruiter-focused evaluation workflow
-
-## Future Enhancements
-
-* Multi-resume comparison
-* Advanced recommendation engine
-* Candidate ranking dashboard
-* Historical trend analytics
-* User authentication
-* Cloud deployment
-* Recruiter management portal
-* AI Resume Assistant
-
-## Learning Outcomes
-
-This project demonstrates practical experience in:
-
-* Full Stack Web Development
-* Machine Learning Integration
-* Natural Language Processing
-* Database Management
-* Data Visualization
-* Software Architecture Design
-* Recruitment Technology Solutions
-
-## Author
-
-Mico Yumul
-
-Computer Engineering Graduate
-
-Passionate about Software Development, Artificial Intelligence, Embedded Systems, IoT, and Data-Driven Solutions.
-=======
 resume-job-matcher/
 │
 ├── app.py
 ├── database.py
 ├── pdf_export.py
-├── resume_history.db
+├── requirements.txt
 │
 ├── analyzers/
 │   ├── ats_analyzer.py
@@ -290,8 +101,6 @@ resume-job-matcher/
 │   ├── job_gap_analyzer.py
 │   ├── resume_analyzer.py
 │   └── semantic_matcher.py
-│
-├── reports/
 │
 ├── templates/
 │   ├── index.html
@@ -304,12 +113,14 @@ resume-job-matcher/
 │   └── js/
 │       └── main.js
 │
+├── reports/
+│
 └── README.md
 ```
 
 ## Key Metrics Generated
 
-### Resume Analysis Metrics
+### Resume Metrics
 
 * Match Score
 * ATS Score
@@ -328,31 +139,57 @@ resume-job-matcher/
 ### Career Metrics
 
 * Predicted Career Path
-* Career Confidence
+* Career Confidence Score
 * Technical Domains Detected
 * Skills Count
 * Domain Count
 
-## Dashboard Overview
+## Dashboard Modules
 
-The dashboard provides:
+### Resume Analysis Dashboard
 
-* Resume Analysis Summary
-* Candidate Profile
-* Career Intelligence
-* Analytics Dashboard
+Provides an overview of:
+
+* Match Score
+* ATS Score
+* Resume Quality Score
+* Resume Grade
+* Hiring Recommendation
+
+### Career Intelligence
+
+Provides:
+
+* Predicted Career Path
+* Career Confidence
 * Skills Analysis
-* Job Gap Analysis
-* Resume Preview
-* Downloadable PDF Reports
+* Domain Analysis
+
+### Job Gap Analysis
+
+Provides:
+
+* Job Skill Match Score
+* Matching Skills
+* Missing Skills
+* Personalized Recommendations
+
+### Analysis History
+
+Provides:
+
+* Historical Analysis Records
+* Performance Statistics
+* Score Tracking
+* Sortable Results
 
 ## Installation
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/resume-job-matcher.git
-cd resume-job-matcher
+git clone https://github.com/MicoYumul/ResumeJobMatcher.git
+cd ResumeJobMatcher
 ```
 
 ### Create Virtual Environment
@@ -381,41 +218,58 @@ pip install -r requirements.txt
 python app.py
 ```
 
-### Open Browser
+### Open in Browser
 
 ```text
 http://127.0.0.1:5000
 ```
 
-## Sample Workflow
+## Workflow
 
 1. Upload a PDF Resume
 2. Paste a Job Description
-3. Run Analysis
+3. Run Resume Analysis
 4. Review ATS and Match Scores
 5. Analyze Skill Gaps
-6. Explore Career Insights
-7. Download Professional PDF Report
+6. Review Career Insights
+7. Download PDF Report
 8. View Analysis History
 
-## Future Enhancements
+## Screenshots
+
+Add project screenshots here:
+
+* Main Dashboard
+* Analytics Dashboard
+* Career Intelligence Section
+* Job Gap Analysis
+* Analysis History
+* PDF Report
+
+## Future Improvements
 
 * Resume Comparison Tool
 * Multi-Resume Benchmarking
-* Job Application Tracker
-* Resume Version Management
-* Cloud Deployment
 * User Authentication
+* Cloud Deployment
+* Enhanced Reporting
+* Additional NLP Models
 
 ## Author
 
-Developed by Mico Yumul
+Mico Yumul
 
 Computer Engineering Graduate
 
-Focused on Software Development, Artificial Intelligence, Embedded Systems, IoT, and Data Analytics.
+Interests:
+
+* Software Development
+* Artificial Intelligence
+* Machine Learning
+* Embedded Systems
+* Internet of Things (IoT)
+* Data Analytics
 
 ## License
 
-This project is intended for educational, research, and portfolio purposes.
->>>>>>> 175a4a0 (Release v1.0 Resume Job Matcher ATS Analyzer)
+This project is released for educational, research, and portfolio purposes.
